@@ -3,20 +3,6 @@ import time
 import sys
 
 
-def safe_input(prompt, valid_values=None, default=None):
-    try:
-        value = input(prompt)
-    except (EOFError, KeyboardInterrupt):
-        print("\nВвод был прерван. Применяется значение по умолчанию.")
-        return default
-
-    if valid_values is not None and value not in valid_values:
-        print("\nНекорректный ввод. Применяется значение по умолчанию.")
-        return default
-
-    return value
-
-
 player = {
     "hp": 100,
     "ammo": 60,
@@ -42,19 +28,13 @@ rooms = [
 
 
 def pause():
-    try:
-        input("\nНажмите Enter, чтобы продолжить...")
-    except (EOFError, KeyboardInterrupt):
-        print("\nПауза пропущена.")
+    input("\nНажмите Enter, чтобы продолжить...")
 
 
 def radio(text):
-    try:
-        print("\n📻 РАЦИЯ:")
-        print(text)
-        time.sleep(1)
-    except Exception as exc:
-        print(f"\nОшибка радиосвязи: {exc}")
+    print("\n📻 РАЦИЯ:")
+    print(text)
+    time.sleep(1)
 
 
 def status():
@@ -77,6 +57,7 @@ def mission_failed(reason):
 
 
 def fight_zombie(name, zombie_hp):
+ 
     print(f"\n🧟 {name} преграждает вам путь!")
 
     while zombie_hp > 0 and player["hp"] > 0:
@@ -86,7 +67,7 @@ def fight_zombie(name, zombie_hp):
 1. Стрелять
 2. Отступить
 """)
-        action = safe_input("> ", valid_values=["1", "2"], default="2")
+        action = input("> ")
 
         if action == "1":
             if player["ammo"] <= 0:
@@ -99,7 +80,7 @@ def fight_zombie(name, zombie_hp):
 
                 if zombie_hp > 0:
                     bite = random.randint(15, 40)
-                    player["hp"] = max(0, player["hp"] - bite)
+                    player["hp"] -= bite
                     print(f"🧟 Зомби укусил вас! -{bite} HP")
 
         elif action == "2":
@@ -115,13 +96,14 @@ def fight_zombie(name, zombie_hp):
     return zombie_hp <= 0
 
 
-def run_game():
-    try:
-        print("=" * 50)
-        print("       Операция по эвакуации не зараженных")
-        print("=" * 50)
+try:
 
-        print("""
+    print("=" * 50)
+    print("       Операция по эвакуации не зараженных")
+
+    print("=" * 50)
+
+    print("""
 🌆 Утро. Город охвачен эпидемией.
 
 Заражённые заполонили улицы, им нужен ням ням, иначе они пухнут с голоду. ПОНЯЛ?!
@@ -133,9 +115,9 @@ def run_game():
 эвакуировать выживших.
 """)
 
-        pause()
+    pause()
 
-        print("""
+    print("""
  Бронемашина останавливается
 у ворот школы.
 
@@ -143,16 +125,16 @@ def run_game():
 и осматриваете территорию.
 """)
 
-        pause()
+    pause()
 
-        radio("""
+    radio("""
 — Приём.
 — Внутри школы есть выжившие.
 — Найдите и выведите их к воротам.
 — Соблюдайте осторожность, зомби внутри.
 """)
 
-        print("""
+    print("""
 Что будете делать?
 
 1. Проверить оружие
@@ -160,212 +142,213 @@ def run_game():
 3. Осмотреть здание школы
 """)
 
-        choice = safe_input("> ", valid_values=["1", "2", "3"], default="3")
+    choice = input("> ")
 
-        if choice == "1":
-            print("\n🔫 Оружие в порядке. Патроны на месте.")
-        elif choice == "2":
-            print("\n📻 Связь устойчивая.")
-        elif choice == "3":
-            print("\n🏫 Здание трёхэтажное. Часть окон разбита.")
-        else:
-            print("\nВы решаете не тратить время.")
+    if choice == "1":
+        print("\n🔫 Оружие в порядке. Патроны на месте.")
+    elif choice == "2":
+        print("\n📻 Связь устойчивая.")
+    elif choice == "3":
+        print("\n🏫 Здание трёхэтажное. Часть окон разбита.")
+    else:
+        print("\nВы решаете не тратить время.")
 
-        pause()
+    pause()
 
-        radio("""
+
+
+    radio("""
 — Группа, входите через главный вход.
 — Двигайтесь по коридорам осторожно.
 """)
 
-        print("""
+    print("""
 🚪 Вы входите в школу.
 
 Коридоры темны и пусты.
 Слышны далёкие стоны.
 """)
 
-        pause()
+    pause()
 
-        event = random.randint(1, 3)
+    event = random.randint(1, 3)
 
-        if event == 1:
-            print("""
+    if event == 1:
+        print("""
 🧟 Из-за угла выходит одиночный зомби!
 """)
-            fight_zombie("Зомби в коридоре", random.randint(40, 70))
+        fight_zombie("Зомби в коридоре", random.randint(40, 70))
 
-        elif event == 2:
-            print("""
+    elif event == 2:
+        print("""
  Коридор пуст.
 
 Вы слышите шорох где-то наверху.
 """)
 
-        else:
-            print("""
+    else:
+        print("""
  Свет мигает и гаснет.
 
 Вы включаете фонари и двигаетесь дальше.
 """)
 
-        pause()
+    pause()
 
-        print("""
+
+
+    print("""
  Впереди несколько кабинетов.
 Нужно проверить их один за другим.
 """)
 
-        pause()
+    pause()
 
-        for room_name, danger in rooms:
-            try:
-                print(f"\n🚪 Вы подходите к кабинету: {room_name}")
+    for room_name, danger in rooms:
 
-                print("""
+        print(f"\n🚪 Вы подходите к кабинету: {room_name}")
+
+        print("""
 1. Войти и проверить
 2. Пропустить кабинет
 """)
 
-                choice = safe_input("> ", valid_values=["1", "2"], default="2")
+        choice = input("> ")
 
-                if choice != "1":
-                    print("Вы решаете не проверять этот кабинет.")
-                    pause()
-                    continue
+        if choice != "1":
+            print("Вы решаете не проверять этот кабинет.")
+            pause()
+            continue
 
-                zombie_chance = danger * 20
+     
+        zombie_chance = danger * 20
 
-                if random.randint(1, 100) <= zombie_chance:
-                    zombie_hp = 30 + danger * 20
-                    won = fight_zombie(room_name, zombie_hp)
+        if random.randint(1, 100) <= zombie_chance:
+            zombie_hp = 30 + danger * 20
+            won = fight_zombie(room_name, zombie_hp)
 
-                    if not won:
-                        print("Вы не стали зачищать этот кабинет до конца.")
-                        pause()
-                        continue
+            if not won:
+                print("Вы не стали зачищать этот кабинет до конца.")
+                pause()
+                continue
 
-                not_rescued = [s for s in survivors if not s["rescued"]]
+        not_rescued = [s for s in survivors if not s["rescued"]]
 
-                if not_rescued and random.randint(1, 100) <= 60:
-                    found = random.choice(not_rescued)
-                    found["rescued"] = True
-                    player["saved"] += 1
+        if not_rescued and random.randint(1, 100) <= 60:
+            found = random.choice(not_rescued)
+            found["rescued"] = True
+            player["saved"] += 1
 
-                    print(f"""
+            print(f"""
  В кабинете «{room_name}» вы находите выжившего:
 {found['name']}!
 
 Вы уводите его в безопасное место.
 """)
-                else:
-                    print(f"В кабинете «{room_name}» никого не оказалось.")
+        else:
+            print(f"В кабинете «{room_name}» никого не оказалось.")
 
-                pause()
+        pause()
 
-            except Exception as exc:
-                print(f"\nОшибка в кабинете «{room_name}»: {exc}")
-                pause()
-                continue
 
-        radio("""
+    radio("""
 — Внимание, группа .
 — Обнаружено скопление зомби
   в спортивном зале.
 — Возможно, там люди.
 """)
 
-        print("""
+    print("""
 Что будете делать?
 
 1. Прорваться в спортзал с боем
 2. Струсить и обойти спортзал стороной
 """)
 
-        choice = safe_input("> ", valid_values=["1", "2"], default="2")
+    choice = input("> ")
 
-        if choice == "1":
-            print("""
+    if choice == "1":
+
+        print("""
 🔫 Вы врываетесь в спортзал.
 
 Внутри  зомби!
 """)
 
-            zombies_left = random.randint(2, 3)
+        zombies_left = random.randint(2, 3)
 
-            while zombies_left > 0 and player["hp"] > 0:
-                won = fight_zombie(f"Зомби #{zombies_left}", random.randint(30, 60))
+        while zombies_left > 0 and player["hp"] > 0:
+            won = fight_zombie(f"Зомби #{zombies_left}", random.randint(30, 60))
 
-                if won:
-                    zombies_left -= 1
-                else:
-                    print("\nВы отступаете из спортзала, не зачистив его до конца.")
-                    break
+            if won:
+                zombies_left -= 1
+            else:
+                print("\nВы отступаете из спортзала, не зачистив его до конца.")
+                break
 
-            if zombies_left == 0:
-                print("""
+        if zombies_left == 0:
+            print("""
 ✅ Спортзал зачищен!
 
 Там прятались несколько учеников,
 но, к счастью, все они уже эвакуированы ранее.
 """)
+           
+            player["ammo"] += 20
+            print("🔫 Вы находите ящик с патронами: +20")
 
-                player["ammo"] += 20
-                print("🔫 Вы находите ящик с патронами: +20")
-
-        else:
-            print("""
+    else:
+        print("""
 Вы решаете не рисковать
 и обходите спортзал стороной.
 """)
 
-        pause()
+    pause()
 
-        rescued_names = [s["name"] for s in survivors if s["rescued"]]
 
-        print("\n" + "=" * 35)
-        print("       ЭВАКУАЦИЯ")
-        print("=" * 30)
 
-        if len(rescued_names) == 0:
-            print("""
+
+    rescued_names = [s["name"] for s in survivors if s["rescued"]]
+
+    print("\n" + "=" * 35)
+    print("       ЭВАКУАЦИЯ")
+    print("=" * 30)
+
+    if len(rescued_names) == 0:
+        print("""
 Вы не нашли ни одного выжившего.
 Отряд возвращается к машине ни с чем.
 """)
-            mission_failed("Вы никого не спасли ")
-        else:
-            print(f"\nВы выводите {len(rescued_names)} человек(а) к воротам:")
-            for name in rescued_names:
-                print(f" - {name}")
+        mission_failed("Вы никого не спасли ")
+    else:
+        print(f"\nВы выводите {len(rescued_names)} человек(а) к воротам:")
+        for name in rescued_names:
+            print(f" - {name}")
 
-        pause()
+    pause()
 
-        radio("""
+    radio("""
 — Приём.
 — Эвакуация принята.
 — Возвращайтесь на базу.
 
 """)
 
-        print("\n" + "=" * 35)
-        print("       МИССИЯ ЗАВЕРШЕНА")
-        print("=" * 35)
+    print("\n" + "=" * 35)
+    print("       МИССИЯ ЗАВЕРШЕНА")
+    print("=" * 35)
 
-        status()
+    status()
 
-        if player["saved"] >= 3:
-            print("\nОтличная работа! Большая часть людей спасена.")
-        elif player["saved"] >= 1:
-            print("\nМиссия выполнена, но не все выжившие найдены.")
-        else:
-            print("\nВы серьезно?")
+    if player["saved"] >= 3:
+        print("\nОтличная работа! Большая часть людей спасена.")
+    elif player["saved"] >= 1:
+        print("\nМиссия выполнена, но не все выжившие найдены.")
+    else:
+        print("\nВы серьезно?")
 
-    except Exception as exc:
-        print(f"\nПроизошла непредвиденная ошибка: {exc}")
-        print("Игра завершена.")
-        status()
-        sys.exit(1)
+except (KeyboardInterrupt, EOFError):
+    print("\n\nИгра прервана.")
 
-
-if __name__ == "__main__":
-    run_game()
+except Exception as e:
+    print(f"\nПроизошла ошибка: {e}")
